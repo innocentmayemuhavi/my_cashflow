@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:my_cashflow/screens/expences/expences.dart';
 import 'package:my_cashflow/screens/homepage/home.dart';
 import 'package:my_cashflow/screens/plans/plans.dart';
+import 'package:my_cashflow/screens/savings/savings.dart';
 import 'package:my_cashflow/screens/settings/settings.dart';
 import 'package:my_cashflow/screens/wallet/wallet.dart';
 import 'package:my_cashflow/shared/styles.dart';
@@ -43,12 +42,18 @@ class _HomeMainState extends State<HomeMain> {
         onItemTapped: _onItemTapped,
         isTitleCentered: _currentIndex == 0 ? false : true,
         hasLeading: _currentIndex == 0 ? false : true,
-        hasAction: false,
+        hasAction: _currentIndex == 1,
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.add),
-          ),
+          TextButton(
+            onPressed: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (context) => const SavingsPage()));
+            },
+            child: Text(
+              'Savings',
+              style: normalTextStyle.copyWith(color: Colors.white),
+            ),
+          )
         ],
         title: _currentIndex == 0
             ? Row(children: [

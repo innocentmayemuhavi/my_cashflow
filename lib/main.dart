@@ -23,9 +23,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         iconTheme:
-            const IconThemeData(color: Colors.black), // Color for light theme
+            const IconThemeData(color: Colors.black), // Color for light themeed
         colorScheme:
             const ColorScheme.light().copyWith(brightness: Brightness.light),
+
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,

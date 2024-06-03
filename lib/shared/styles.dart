@@ -15,3 +15,8 @@ var elevatedButtonStyle = ElevatedButton.styleFrom(
     borderRadius: BorderRadius.circular(25),
   ),
 );
+var normalButtonStyle = BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(25),
+  border: Border.all(color: Colors.grey),
+);

@@ -4,7 +4,6 @@ import 'package:my_cashflow/shared/styles.dart';
 import 'package:intl/intl.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/utils/utils.dart';
-import 'package:my_cashflow/shared/styles.dart';
 
 class CreatePlan extends StatefulWidget {
   const CreatePlan({super.key});
@@ -277,10 +276,11 @@ class _CreatePlanState extends State<CreatePlan> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   print('cool');
+                  Navigator.pop(context);
                 }
               },
               child: Text(
-                'Create plan',
+                'Save plan',
                 style: normalTextStyle.copyWith(
                   color: Colors.white,
                 ),

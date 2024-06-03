@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:my_cashflow/screens/cards/transactioncard.dart';
 import 'package:my_cashflow/shared/styles.dart';
 
-class MyExpences extends StatefulWidget {
-  const MyExpences({super.key});
+class IncomesPage extends StatefulWidget {
+  const IncomesPage({super.key});
 
   @override
-  State<MyExpences> createState() => _MyExpencesState();
+  State<IncomesPage> createState() => _IncomesPageState();
 }
 
-class _MyExpencesState extends State<MyExpences> {
+class _IncomesPageState extends State<IncomesPage> {
   @override
   final List<int> _items = List<int>.generate(100, (index) => index);
   @override
@@ -35,7 +35,7 @@ class _MyExpencesState extends State<MyExpences> {
           ),
         ),
         title: Text(
-          'My Expenses',
+          'My Incomes',
           style: appbarTitleStyle,
         ),
       ),

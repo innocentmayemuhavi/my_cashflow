@@ -54,7 +54,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               ))
           : null,
       title: widget.title,
-      actions: widget.hasAction ? widget.actions : null,
+      actions:  widget.hasAction ? widget.actions : null,
     );
   }
 }

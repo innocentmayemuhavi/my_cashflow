@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/screens/cards/plancard.dart';
+import 'package:my_cashflow/screens/cards/transactioncard.dart';
+import 'package:my_cashflow/screens/expences/expences.dart';
+import 'package:my_cashflow/screens/incomes/incomes.dart';
 import 'package:my_cashflow/shared/styles.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:my_cashflow/widgets/main_blc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,71 +21,7 @@ class _HomePageState extends State<HomePage> {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(15),
       children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              Text(
-                'My budget',
-                style: normalTextStyle.copyWith(fontSize: 25),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Ksh 10,000',
-                style: boldTextStyle.copyWith(fontSize: 35),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.arrow_down_left_circle,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          Container(
-                            width: 10,
-                          ),
-                          Text(
-                            'Add income',
-                            style: normalTextStyle.copyWith(
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          )
-                        ],
-                      )),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.arrow_up_right_circle,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          Container(
-                            width: 10,
-                          ),
-                          Text(
-                            'Add expense',
-                            style: normalTextStyle.copyWith(
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          )
-                        ],
-                      ))
-                ],
-              )
-            ],
-          ),
-        ),
+        const MainBlc(),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,25 +74,34 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Row(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Incomes',
-                              style: normalTextStyle.copyWith(
-                                  fontSize: 20, color: Colors.grey)),
-                          Text(
-                            'Ksh 10,000',
-                            style: boldTextStyle.copyWith(
-                                fontSize: 25, fontWeight: FontWeight.normal),
-                          )
-                        ],
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => const IncomesPage()),
+                          );
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Incomes',
+                                style: normalTextStyle.copyWith(
+                                    fontSize: 20, color: Colors.grey)),
+                            Text(
+                              'Ksh 10,000',
+                              style: boldTextStyle.copyWith(
+                                  fontSize: 25, fontWeight: FontWeight.normal),
+                            )
+                          ],
+                        ),
                       ),
                       IconButton(
                         padding: const EdgeInsets.all(0),
                         style: ButtonStyle(
                           shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                   50), // Adjust this value as needed
@@ -162,7 +111,13 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => const IncomesPage()),
+                          );
+                        },
                         icon: const Icon(
                           CupertinoIcons.arrow_up_right,
                           size: 15,
@@ -179,76 +134,91 @@ class _HomePageState extends State<HomePage> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const Icon(
-                        CupertinoIcons.arrow_up_right_circle,
-                      ),
-                      Container(
-                        width: 55,
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Icon(
-                            Icons.trending_down,
-                            color: Colors.green,
-                            size: 17,
-                          ),
-                          Text(
-                            '-1.23%',
-                            style: normalTextStyle.copyWith(
-                                color: Colors.green, fontSize: 15),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Spending',
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => const MyExpences()),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(
+                          CupertinoIcons.arrow_up_right_circle,
+                        ),
+                        Container(
+                          width: 55,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Icon(
+                              Icons.trending_down,
+                              color: Colors.green,
+                              size: 17,
+                            ),
+                            Text(
+                              '-1.23%',
                               style: normalTextStyle.copyWith(
-                                  fontSize: 20, color: Colors.grey)),
-                          Text(
-                            'Ksh 10,000',
-                            style: boldTextStyle.copyWith(
-                                fontSize: 25, fontWeight: FontWeight.normal),
-                          )
-                        ],
-                      ),
-                      IconButton(
-                        padding: const EdgeInsets.all(0),
-                        style: ButtonStyle(
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  50), // Adjust this value as needed
-                              side: const BorderSide(
-                                  color: Colors
-                                      .grey), // Adjust this value as needed
+                                  color: Colors.green, fontSize: 15),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Spending',
+                                style: normalTextStyle.copyWith(
+                                    fontSize: 20, color: Colors.grey)),
+                            Text(
+                              'Ksh 10,000',
+                              style: boldTextStyle.copyWith(
+                                  fontSize: 25, fontWeight: FontWeight.normal),
+                            )
+                          ],
+                        ),
+                        IconButton(
+                          padding: const EdgeInsets.all(0),
+                          style: ButtonStyle(
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    50), // Adjust this value as needed
+                                side: const BorderSide(
+                                    color: Colors
+                                        .grey), // Adjust this value as needed
+                              ),
                             ),
                           ),
-                        ),
-                        onPressed: () {},
-                        icon: const Icon(
-                          CupertinoIcons.arrow_up_right,
-                          size: 15,
-                        ),
-                      )
-                    ],
-                  )
-                ],
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (context) => const MyExpences()),
+                            );
+                          },
+                          icon: const Icon(
+                            CupertinoIcons.arrow_up_right,
+                            size: 15,
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
               ),
             )
           ],
@@ -258,14 +228,14 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'My Plan',
+              'My Plans',
               style: normalTextStyle.copyWith(fontSize: 17),
             ),
-            Text(
-              'See all',
-              style: normalTextStyle.copyWith(
-                  fontSize: 13, color: Theme.of(context).colorScheme.secondary),
-            )
+            // Text(
+            //   'See all',
+            //   style: normalTextStyle.copyWith(
+            //       fontSize: 13, color: Theme.of(context).colorScheme.secondary),
+            // )
           ],
         ),
         const SizedBox(height: 10),
@@ -277,57 +247,7 @@ class _HomePageState extends State<HomePage> {
             scrollDirection: Axis.horizontal,
             itemCount: 10,
             itemBuilder: (context, index) {
-              return Container(
-                  padding: const EdgeInsets.all(15),
-                  margin: const EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  height: 100,
-                  width: 300,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '#Construction',
-                        style: normalTextStyle.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        'House Building',
-                        style: normalTextStyle.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Ksh 5,000',
-                            style: boldTextStyle.copyWith(fontSize: 15),
-                          ),
-                          Text(
-                            'Ksh 10,000',
-                            style: normalTextStyle.copyWith(
-                                fontSize: 15, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      LinearProgressIndicator(
-                        color: Colors.red,
-                        minHeight: 10,
-                        borderRadius: BorderRadius.circular(10),
-                        value:
-                            .6, // Update this value (0.0 to 1.0) to reflect the current progress
-                        backgroundColor: Colors.grey[200],
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.blue),
-                      ),
-                    ],
-                  ));
+              return const Plancard();
             },
           ),
         ),
@@ -352,64 +272,7 @@ class _HomePageState extends State<HomePage> {
           physics: const BouncingScrollPhysics(),
           itemCount: 10,
           itemBuilder: (context, index) {
-            return Container(
-              padding: const EdgeInsets.all(15),
-              margin: const EdgeInsets.only(top: 10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Shopping',
-                            style: normalTextStyle.copyWith(
-                                fontSize: 15, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            'Ksh 5,000',
-                            style: boldTextStyle.copyWith(fontSize: 15),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Dec 12th 2024',
-                        style: normalTextStyle.copyWith(
-                            fontSize: 15, color: Colors.grey),
-                      ),
-                      Text(
-                        '12:00 PM',
-                        style: normalTextStyle.copyWith(
-                            fontSize: 15, color: Colors.grey),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            );
+            return const TransactionCard();
           },
         ),
       ],

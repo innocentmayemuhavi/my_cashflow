@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Color getColor(String colorName) {
   switch (colorName) {
@@ -21,4 +22,11 @@ Color getColor(String colorName) {
     default:
       return Colors.black;
   }
+}
+
+String curencyFommater(String amount) {
+  return amount.isNotEmpty
+      ? NumberFormat.currency(locale: 'en_US', name: 'KES', symbol: '')
+          .format(int.parse(amount))
+      : '0.00';
 }
