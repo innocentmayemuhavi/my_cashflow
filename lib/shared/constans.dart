@@ -2,6 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/expe_category.dart';
 
+String SERVICE_ID = 'service_k2oj9vr';
+String TEMPLETE_ID = 'template_3rtuvzr';
+String PUBLIC_ID = 'q5VXEtcHUKdOXZrd9';
+String PRIVATE_KEY = 'seA5FkaY3-dMFrRYBaOBl';
+
 const List<String> categories = [
   'Food',
   'Transport',
