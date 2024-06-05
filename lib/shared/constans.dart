@@ -39,7 +39,7 @@ List<ExpeCategory> expeCategory = [
       icon: const Icon(CupertinoIcons.car_detailed)),
   ExpeCategory(
       id: '3',
-      name: 'Enterntainment',
+      name: 'Entertainment',
       color: Colors.red,
       icon: const Icon(CupertinoIcons.music_mic)),
   ExpeCategory(

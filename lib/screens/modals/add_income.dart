@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/services/firestore/wallet/wallet.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
+import 'package:provider/provider.dart';
 
 class AddIncome extends StatefulWidget {
-  const AddIncome({super.key});
+  const AddIncome({super.key, required this.balance});
+  final double balance;
 
   @override
   State<AddIncome> createState() => _AddIncomeState();
@@ -12,20 +16,24 @@ class AddIncome extends StatefulWidget {
 
 class _AddIncomeState extends State<AddIncome> {
   String number = '0';
+  bool _isLoading = false;
   String? selectedCategory;
   Color? selectedColor;
-  final int _limit = 50000;
+
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
   final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
+
     return SizedBox(
         height: MediaQuery.of(context).size.height * 1,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: int.parse(number.isNotEmpty ? number : '0') <= _limit &&
+          physics: double.parse(number.isNotEmpty ? number : '0.0') <=
+                      widget.balance &&
                   number != '0' &&
                   number.isNotEmpty
               ? const BouncingScrollPhysics()
@@ -94,24 +102,36 @@ class _AddIncomeState extends State<AddIncome> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Wallet Balance: KSH. 50,000.00',
+                        'Wallet Balance: KSH. ${widget.balance}0',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                       ElevatedButton(
-                        onPressed: number.isNotEmpty && number != '0'
-                            ? () {
+                        onPressed: number.isNotEmpty && number != '0'&&!_isLoading
+                            ? () async {
                                 if (number != '0' && number.isNotEmpty) {
-                                  Navigator.pop(context);
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  await WalletService()
+                                      .addAmount(user.uid, double.parse(number))
+                                      .then((_) => {
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                            Navigator.pop(context)
+                                          })
+                                      .catchError((e) {
+                                    print(e.toString());
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  });
                                 }
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
-                            // int.parse(number.isNotEmpty ? number : '0') <=
-                            //         _limit
-                            //     ? Colors.green
-                            //     : Colors.red,
                             fixedSize: Size(
                                 MediaQuery.of(context).size.width * 0.75, 35),
                             padding: const EdgeInsets.symmetric(
@@ -119,7 +139,7 @@ class _AddIncomeState extends State<AddIncome> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20))),
                         child: Text(
-                          'Deposit',
+                          _isLoading ? 'Depositing...' : 'Deposit',
                           style: normalTextStyle.copyWith(
                             color: Colors.white,
                           ),

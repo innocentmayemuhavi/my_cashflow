@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/user_model.dart';
 import 'package:my_cashflow/screens/homepage/home.dart';
 import 'package:my_cashflow/screens/plans/plans.dart';
 import 'package:my_cashflow/screens/savings/savings.dart';
@@ -8,6 +9,7 @@ import 'package:my_cashflow/screens/wallet/wallet.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/widgets/appbar.dart';
 import 'package:my_cashflow/widgets/bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
 
 class HomeMain extends StatefulWidget {
   const HomeMain({super.key});
@@ -36,6 +38,7 @@ class _HomeMainState extends State<HomeMain> {
 
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return Scaffold(
       appBar: AppBarWidget(
         previousIndex: _previousIndex,
@@ -46,8 +49,10 @@ class _HomeMainState extends State<HomeMain> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (context) => const SavingsPage()));
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (context) => const SavingsPage()));
             },
             child: Text(
               'Savings',
@@ -60,7 +65,7 @@ class _HomeMainState extends State<HomeMain> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hello,Maye',
+                    Text('Hello, ${user.displayName}',
                         style: normalTextStyle.copyWith(fontSize: 30)),
                     Text(
                       'Your Cashflow',

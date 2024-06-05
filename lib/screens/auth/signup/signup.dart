@@ -1,15 +1,12 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:emailjs/emailjs.dart';
-import 'package:flutter/widgets.dart';
 import 'package:my_cashflow/services/authentication/authentication.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:my_cashflow/utils/error_formarter.dart';
 import 'package:my_cashflow/utils/random_code_gen.dart';
-import 'package:nanoid/nanoid.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key, required this.toggleLogin});
@@ -71,12 +68,12 @@ class _SignupState extends State<Signup> {
             const SizedBox(height: 20),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 child: Form(
                   key: _formKey,
@@ -280,12 +277,12 @@ class _SignupState extends State<Signup> {
             const SizedBox(height: 20),
             Expanded(
                 child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.secondary,
               ),
               child: Form(
                 key: _formKey1,
@@ -451,12 +448,12 @@ class _SignupState extends State<Signup> {
             const SizedBox(height: 20),
             Expanded(
                 child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.secondary,
               ),
               child: ListView(
                 padding: const EdgeInsets.all(20),

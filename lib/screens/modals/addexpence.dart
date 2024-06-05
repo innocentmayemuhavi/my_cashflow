@@ -1,11 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/expence_class.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/services/firestore/wallet/wallet.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
+import 'package:provider/provider.dart';
 
 class Addexpence extends StatefulWidget {
-  const Addexpence({super.key});
+  const Addexpence({super.key, required this.balance});
+  final double balance;
 
   @override
   State<Addexpence> createState() => _AddexpenceState();
@@ -13,6 +19,7 @@ class Addexpence extends StatefulWidget {
 
 class _AddexpenceState extends State<Addexpence> {
   String number = '0';
+  bool _isLoading = false;
   String? selectedCategory;
   Color? selectedColor;
   final int _limit = 50000;
@@ -22,6 +29,7 @@ class _AddexpenceState extends State<Addexpence> {
   final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return SizedBox(
         height: MediaQuery.of(context).size.height * 01,
         width: MediaQuery.of(context).size.width,
@@ -76,11 +84,11 @@ class _AddexpenceState extends State<Addexpence> {
                           controller: _controller,
                           style: normalTextStyle.copyWith(
                               fontSize: 35,
-                              color:
-                                  int.parse(number.isNotEmpty ? number : '0') <=
-                                          _limit
-                                      ? Colors.green
-                                      : Colors.red),
+                              color: double.parse(
+                                          number.isNotEmpty ? number : '0.0') <=
+                                      widget.balance
+                                  ? Colors.green
+                                  : Colors.red),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           cursorColor: Colors.green,
@@ -94,7 +102,7 @@ class _AddexpenceState extends State<Addexpence> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Wallet Balance: KSH. 50,000.00',
+                        'Wallet Balance: KSH. ${widget.balance.toStringAsFixed(2)}',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
@@ -114,11 +122,11 @@ class _AddexpenceState extends State<Addexpence> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                int.parse(number.isNotEmpty ? number : '0') <=
-                                        _limit
-                                    ? Colors.green
-                                    : Colors.red,
+                            backgroundColor: double.parse(
+                                        number.isNotEmpty ? number : '0.0') <=
+                                    widget.balance
+                                ? Colors.green
+                                : Colors.red,
                             fixedSize: Size(
                                 MediaQuery.of(context).size.width * 0.75, 35),
                             padding: const EdgeInsets.symmetric(
@@ -239,15 +247,33 @@ class _AddexpenceState extends State<Addexpence> {
                         side: BorderSide(color: selectedColor ?? Colors.grey),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  onPressed: selectedCategory != null
-                      ? () {
+                  onPressed: selectedCategory != null && !_isLoading
+                      ? () async {
                           if (selectedCategory != null) {
-                            Navigator.pop(context);
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            await WalletService()
+                                .deductAmount(
+                                    user.uid,
+                                    ExpenceClass(
+                                        amount: double.parse(number),
+                                        timestamp: Timestamp.now(),
+                                        category: selectedCategory!))
+                                .then((_) => {
+                                      setState(() => _isLoading = false),
+                                      Navigator.pop(context)
+                                    })
+                                .catchError((e) => {
+                                      setState(() => _isLoading = false),
+                                      print(e)
+                                    });
                           }
                         }
                       : null,
                   child: Text(
-                    'Finish',
+                    _isLoading ? 'Please Wait...' : 'Finish',
                     style: normalTextStyle.copyWith(color: selectedColor),
                   ),
                 )

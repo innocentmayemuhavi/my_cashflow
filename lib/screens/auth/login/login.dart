@@ -23,14 +23,13 @@ class _LoginState extends State<Login> {
   String? _email;
   String _code = '';
   String? _password;
-  String? _confirmPassword;
-  String? _name;
-  final int _currentIndex = 0;
+
   String _error = '';
   bool _onEditing = true;
   bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
+    print(Theme.of(context).colorScheme.secondary);
     return Scaffold(
         body: PageView(
       controller: _pageController,
@@ -50,12 +49,12 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 20),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 child: Form(
                   key: _formKey,
@@ -166,7 +165,7 @@ class _LoginState extends State<Login> {
                                     _isLoading = true;
                                   });
                                   try {
-                                    var result = await EmailJS.send(
+                                    await EmailJS.send(
                                       SERVICE_ID,
                                       TEMPLETE_ID,
                                       {
@@ -189,8 +188,6 @@ class _LoginState extends State<Login> {
                                         curve: Curves.easeIn);
                                   } catch (error) {
                                     if (error is EmailJSResponseStatus) {
-                                      print(
-                                          'ERROR... ${error.status}: ${error.text}');
                                       setState(() {
                                         _isLoading = false;
                                         _error =
@@ -255,12 +252,12 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 20),
             Expanded(
                 child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.secondary,
               ),
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -287,11 +284,9 @@ class _LoginState extends State<Login> {
                     fullBorder: true,
                     textStyle: TextStyle(
                       fontSize: 20.0,
-                      color: _code.length == 4 && _code != _sentCode
-                          ? Colors.red
-                          : Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
                     ),
                     keyboardType: TextInputType.number,
                     underlineColor: _code == _sentCode

@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/user_model.dart';
 import 'package:my_cashflow/screens/cards/plancard.dart';
 import 'package:my_cashflow/screens/cards/transactioncard.dart';
 import 'package:my_cashflow/screens/expences/expences.dart';
 import 'package:my_cashflow/screens/incomes/incomes.dart';
+import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
+import 'package:my_cashflow/utils/formart_curr.dart';
 import 'package:my_cashflow/widgets/main_blc.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(15),
@@ -56,20 +61,45 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         width: 55,
                       ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.trending_up,
-                            color: Colors.green,
-                            size: 17,
-                          ),
-                          Text(
-                            '+3.23%',
-                            style: normalTextStyle.copyWith(
-                                color: Colors.green, fontSize: 15),
-                          )
-                        ],
-                      )
+                      StreamBuilder(
+                          stream: Walletstream().getIncome(user.uid),
+                          builder: (context, snapshot) {
+                            return Row(
+                              children: [
+                                Icon(
+                                  snapshot.data != null
+                                      ? snapshot.data!.percentage < 0
+                                          ? snapshot.data!.percentage == 0
+                                              ? Icons.remove
+                                              : Icons.trending_down
+                                          : Icons.trending_up
+                                      : Icons.line_axis,
+                                  color: snapshot.data != null
+                                      ? snapshot.data!.percentage < 0
+                                          ? Colors.red
+                                          : snapshot.data!.percentage == 0
+                                              ? Colors.grey
+                                              : Colors.green
+                                      : Colors.grey,
+                                  size: 17,
+                                ),
+                                Text(
+                                  snapshot.data != null
+                                      ? '${snapshot.data!.percentage.toString()} %'
+                                      : '0.0%',
+                                  style: normalTextStyle.copyWith(
+                                      color: snapshot.data != null
+                                          ? snapshot.data!.percentage < 0
+                                              ? Colors.red
+                                              : snapshot.data!.percentage == 0
+                                                  ? Colors.grey
+                                                  : Colors.green
+                                          : Colors.grey,
+                                      fontSize: 15),
+                                )
+                              ],
+                            );
+                          })
                     ],
                   ),
                   Row(
@@ -89,11 +119,18 @@ class _HomePageState extends State<HomePage> {
                             Text('Incomes',
                                 style: normalTextStyle.copyWith(
                                     fontSize: 20, color: Colors.grey)),
-                            Text(
-                              'Ksh 10,000',
-                              style: boldTextStyle.copyWith(
-                                  fontSize: 25, fontWeight: FontWeight.normal),
-                            )
+                            StreamBuilder(
+                                stream: Walletstream().getIncome(user.uid),
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    snapshot.data != null
+                                        ? 'Ksh ${formatNumber(snapshot.data!.total)}'
+                                        : 'Ksh. 0.0',
+                                    style: boldTextStyle.copyWith(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.normal),
+                                  );
+                                })
                           ],
                         ),
                       ),
@@ -155,22 +192,45 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           width: 55,
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Icon(
-                              Icons.trending_down,
-                              color: Colors.green,
-                              size: 17,
-                            ),
-                            Text(
-                              '-1.23%',
-                              style: normalTextStyle.copyWith(
-                                  color: Colors.green, fontSize: 15),
-                            )
-                          ],
-                        )
+                        StreamBuilder(
+                            stream: Walletstream().getSpending(user.uid),
+                            builder: (context, snapshot) {
+                              return Row(
+                                children: [
+                                  Icon(
+                                    snapshot.data != null
+                                        ? snapshot.data!.percentage > 0
+                                            ? Icons.trending_up
+                                            : snapshot.data!.percentage == 0.0
+                                                ? Icons.remove
+                                                : Icons.trending_down
+                                        : Icons.remove,
+                                    color: snapshot.data != null
+                                        ? snapshot.data!.percentage > 0
+                                            ? Colors.red
+                                            : snapshot.data!.percentage == 0
+                                                ? Colors.grey
+                                                : Colors.green
+                                        : Colors.grey,
+                                    size: 17,
+                                  ),
+                                  Text(
+                                    snapshot.data != null
+                                        ? '${snapshot.data!.percentage.toString()}%'
+                                        : '0.0%',
+                                    style: normalTextStyle.copyWith(
+                                        color: snapshot.data != null
+                                            ? snapshot.data!.percentage > 0
+                                                ? Colors.red
+                                                : snapshot.data!.percentage == 0
+                                                    ? Colors.grey
+                                                    : Colors.green
+                                            : Colors.grey,
+                                        fontSize: 15),
+                                  )
+                                ],
+                              );
+                            })
                       ],
                     ),
                     Row(
@@ -182,11 +242,20 @@ class _HomePageState extends State<HomePage> {
                             Text('Spending',
                                 style: normalTextStyle.copyWith(
                                     fontSize: 20, color: Colors.grey)),
-                            Text(
-                              'Ksh 10,000',
-                              style: boldTextStyle.copyWith(
-                                  fontSize: 25, fontWeight: FontWeight.normal),
-                            )
+                            StreamBuilder(
+                                stream: Walletstream().getSpending(user.uid),
+                                builder: (context, snapshot) {
+                                  // Check if snapshot.data is not null before accessing its total property
+
+                                  return Text(
+                                    snapshot.data != null
+                                        ? 'Ksh ${formatNumber(snapshot.data!.total)}'
+                                        : 'Ksh. 0.0',
+                                    style: boldTextStyle.copyWith(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.normal),
+                                  );
+                                })
                           ],
                         ),
                         IconButton(
@@ -267,14 +336,43 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         const SizedBox(height: 10),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const BouncingScrollPhysics(),
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return const TransactionCard();
+        StreamBuilder(
+          stream: Walletstream().getTransactions(user.uid),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                padding: const EdgeInsets.all(100),
+                child: Center(
+                  child: Text(
+                    'Loading Transactions ..',
+                    style: normalTextStyle,
+                  ),
+                ),
+              ); // return a loading indicator while waiting
+            }
+
+            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return TransactionCard(transaction: snapshot.data![index]);
+                },
+              );
+            }
+
+            return Container(
+              padding: const EdgeInsets.all(100),
+              child: Center(
+                child: Text(
+                  'Sorry, No transactions yet!.',
+                  style: normalTextStyle,
+                ),
+              ),
+            );
           },
-        ),
+        )
       ],
     );
   }

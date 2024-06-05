@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:my_cashflow/models/user_model.dart';
 import 'package:my_cashflow/screens/auth/auth.dart';
 import 'package:my_cashflow/services/authentication/authentication.dart';

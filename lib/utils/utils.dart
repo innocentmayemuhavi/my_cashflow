@@ -30,3 +30,10 @@ String curencyFommater(String amount) {
           .format(int.parse(amount))
       : '0.00';
 }
+
+String doublecurrencyFormatter(double amount) {
+  return amount != null
+      ? NumberFormat.currency(locale: 'en_US', name: 'KES', symbol: '')
+          .format(amount)
+      : '0.00';
+}
