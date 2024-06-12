@@ -47,7 +47,6 @@ dependencies:
   flutter_verification_code: ^1.1.7
   nanoid: ^1.0.0
   cloud_firestore: ^4.17.5
-  flutter_date_range_picker: ^0.1.1
   date_picker_timeline: ^1.2.6
  
 
