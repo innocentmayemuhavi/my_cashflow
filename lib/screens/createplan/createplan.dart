@@ -1,9 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_date_range_picker/flutter_date_range_picker.dart';
+import 'package:my_cashflow/models/plans_model.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/services/firestore/plans/plans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:intl/intl.dart';
+import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/utils/utils.dart';
+import 'package:nanoid/nanoid.dart';
+import 'package:provider/provider.dart';
 
 class CreatePlan extends StatefulWidget {
   const CreatePlan({super.key});
@@ -13,18 +20,22 @@ class CreatePlan extends StatefulWidget {
 }
 
 class _CreatePlanState extends State<CreatePlan> {
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
+  bool _isLoading = false;
   String _category = 'Food';
+
   String _color = 'Blue';
   String? _planName;
   String? _amount;
   String? _description;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -179,68 +190,53 @@ class _CreatePlanState extends State<CreatePlan> {
                     const SizedBox(height: 20),
                     Text('Start date', style: normalTextStyle),
                     const SizedBox(height: 10),
-                    InkWell(
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-
-                        if (pickedDate != null) {
-                          _startDateController.text =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
-                        }
-                      },
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter start date';
-                          }
-                          return null;
-                        },
-                        ignorePointers: true,
-                        controller: _startDateController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter start date',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        DatePicker(
+                          monthTextStyle:
+                              normalTextStyle.copyWith(fontSize: 10),
+                          dayTextStyle: normalTextStyle.copyWith(fontSize: 10),
+                          dateTextStyle: normalTextStyle.copyWith(fontSize: 20),
+                          DateTime.now(),
+                          initialSelectedDate: DateTime.now(),
+                          selectionColor:
+                              Theme.of(context).colorScheme.secondary,
+                          selectedTextColor: Colors.white,
+                          onDateChange: (date) {
+                            // New date selected
+                            setState(() {
+                              _startDate = date;
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Text('End date', style: normalTextStyle),
                     const SizedBox(height: 10),
-                    InkWell(
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        _endDateController.text =
-                            DateFormat('yyyy-MM-dd').format(pickedDate!);
-                      },
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter end date';
-                            }
-                            return null;
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        DatePicker(
+                          monthTextStyle:
+                              normalTextStyle.copyWith(fontSize: 10),
+                          dayTextStyle: normalTextStyle.copyWith(fontSize: 10),
+                          dateTextStyle: normalTextStyle.copyWith(fontSize: 20),
+                          DateTime.now(),
+                          initialSelectedDate:
+                              DateTime.now().add(const Duration(days: 3)),
+                          selectionColor:
+                              Theme.of(context).colorScheme.secondary,
+                          selectedTextColor: Colors.white,
+                          onDateChange: (date) {
+                            // New date selected
+                            setState(() {
+                              _endDate = date;
+                            });
                           },
-                          controller: _endDateController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter end date',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                         ),
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Text('Description', style: normalTextStyle),
@@ -273,14 +269,53 @@ class _CreatePlanState extends State<CreatePlan> {
                 backgroundColor:
                     WidgetStateProperty.all(getColor(_color.toLowerCase())),
               ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  print('cool');
-                  Navigator.pop(context);
-                }
-              },
+              onPressed: _isLoading
+                  ? null
+                  : () async {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        PlansServices()
+                            .addPlan(
+                                user.uid,
+                                PlansModel(
+                                  id: nanoid(20),
+                                  amount: int.parse(_amount!),
+                                  spent: 0,
+                                  category: _category,
+                                  color: _color,
+                                  description: _description!,
+                                  endDate: _endDate ??
+                                      DateTime.now()
+                                          .add(const Duration(days: 3)),
+                                  planName: _planName!,
+                                  startDate: _startDate ?? DateTime.now(),
+                                  transactions: [],
+                                ))
+                            .then((_) => {
+                                  setState(() {
+                                    _isLoading = false;
+                                  }),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        backgroundColor:
+                                            getColor(_color.toLowerCase()),
+                                        content: const Text(
+                                            'Plan added successfully!')),
+                                  ),
+                                })
+                            .then((_) => Navigator.pop(context))
+                            .catchError((e) {
+                          print(e.toString());
+                        });
+
+                        // Navigator.pop(context);
+                      }
+                    },
               child: Text(
-                'Save plan',
+                _isLoading ? 'Saving...' : 'Save plan',
                 style: normalTextStyle.copyWith(
                   color: Colors.white,
                 ),

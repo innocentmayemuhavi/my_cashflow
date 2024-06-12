@@ -1,19 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/plan_finance_model.dart';
+import 'package:my_cashflow/models/plans_model.dart';
+import 'package:my_cashflow/models/transaction_model.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/screens/cards/transactioncard.dart';
 import 'package:my_cashflow/screens/modals/add_deposit.dart';
 import 'package:my_cashflow/screens/modals/addplanbudget.dart';
 import 'package:my_cashflow/screens/modals/deleteplan.dart';
+import 'package:my_cashflow/services/firestore/streams/plans_streams.dart';
+import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
+import 'package:my_cashflow/utils/date_formatter.dart';
+import 'package:my_cashflow/utils/get_col_icon.dart';
+import 'package:my_cashflow/utils/percentage_spent_calc.dart';
+import 'package:my_cashflow/utils/progress_calc.dart';
+import 'package:my_cashflow/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class ViewPlan extends StatefulWidget {
-  const ViewPlan({super.key});
+  const ViewPlan({super.key, required this.plan});
+  final PlansModel plan;
 
   @override
   State<ViewPlan> createState() => _ViewPlanState();
 }
 
 class _ViewPlanState extends State<ViewPlan> {
-  void _showAddTransaction(BuildContext context) {
+  void _showAddTransaction(BuildContext context, uid, budget) {
     showModalBottomSheet(
         showDragHandle: true,
         isScrollControlled: true,
@@ -25,11 +39,14 @@ class _ViewPlanState extends State<ViewPlan> {
               topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         ),
         builder: (context) {
-          return const AddPlanTransaction();
+          return AddPlanTransaction(
+              budget: int.parse(budget.toString()),
+              uid: uid,
+              planId: widget.plan.id);
         });
   }
 
-  void _showDeposit(BuildContext context) {
+  void _showDeposit(BuildContext context, uid, budget) {
     showModalBottomSheet(
         showDragHandle: true,
         isScrollControlled: true,
@@ -41,7 +58,11 @@ class _ViewPlanState extends State<ViewPlan> {
               topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         ),
         builder: (context) {
-          return const PlanDeposit();
+          return PlanDeposit(
+            uid: uid,
+            planId: widget.plan.id,
+            budget: budget,
+          );
         });
   }
 
@@ -50,12 +71,15 @@ class _ViewPlanState extends State<ViewPlan> {
         context: context,
         showDragHandle: true,
         builder: (context) {
-          return const Deleteplan();
+          return Deleteplan(
+            planId: widget.plan.id,
+          );
         });
   }
 
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -112,32 +136,50 @@ class _ViewPlanState extends State<ViewPlan> {
                   children: [
                     Center(
                       child: Icon(
-                        CupertinoIcons.car_detailed,
-                        size: 50,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                        size: 100,
+                        widget.plan.category == 'Income'
+                            ? CupertinoIcons.arrow_down_left_circle
+                            : widget.plan.category == 'Food'
+                                ? Icons.food_bank
+                                : widget.plan.category == 'Shopping'
+                                    ? CupertinoIcons.shopping_cart
+                                    : widget.plan.category == 'Transport'
+                                        ? CupertinoIcons.car_detailed
+                                        : widget.plan.category ==
+                                                'Entertainment'
+                                            ? CupertinoIcons.music_mic
+                                            : Icons.more_horiz,
+                        color: getColor(widget.plan.color.toLowerCase()),
                       ),
                     ),
                     const SizedBox(
                       height: 20,
                     ),
                     Text(
-                      '#Transport',
-                      style: boldTextStyle.copyWith(color: Colors.blue),
+                      '#${widget.plan.category}',
+                      style: boldTextStyle.copyWith(
+                          color: getColor(widget.plan.color.toLowerCase())),
                     ),
                     // const SizedBox(
                     //   height: 10,
                     // ),
                     Text(
-                      'Trip to Kapsabet',
+                      widget.plan.planName,
                       style: boldTextStyle.copyWith(
                         fontSize: 25,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      'Created at 12/12/2021',
+                      overflow: TextOverflow.fade,
+                      widget.plan.description,
+                      style: boldTextStyle.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Created on ${formatDate(widget.plan.startDate)}',
                       style: normalTextStyle.copyWith(
                         fontSize: 15,
                         color: Colors.grey,
@@ -145,7 +187,7 @@ class _ViewPlanState extends State<ViewPlan> {
                       ),
                     ),
                     Text(
-                      'End  at 12/12/2021',
+                      'End  at ${formatDate(widget.plan.endDate)}',
                       style: normalTextStyle.copyWith(
                         fontSize: 15,
                         color: Colors.grey,
@@ -179,73 +221,153 @@ class _ViewPlanState extends State<ViewPlan> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Ksh 5000',
-                          style: boldTextStyle.copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              _showDeposit(context);
-                            },
-                            child: Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.arrow_down_left_circle,
+                        StreamBuilder(
+                          stream: PlansStreams()
+                              .getPlanFinance(user.uid, widget.plan.id),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData || snapshot.data == null) {
+                              return Text(
+                                'Ksh 0.0',
+                                style: boldTextStyle.copyWith(
                                   color: Theme.of(context).brightness ==
                                           Brightness.dark
                                       ? Colors.white
                                       : Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text('Deposit',
-                                    style: normalTextStyle.copyWith(
+                              );
+                            }
+
+                            return Text(
+                              'Ksh  ${snapshot.data['amount'].toString()}',
+                              style: boldTextStyle.copyWith(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          },
+                        ),
+                        StreamBuilder<double>(
+                          stream: Walletstream().getBalance(user.uid),
+                          builder: (context, snapshot) {
+                            return TextButton(
+                                onPressed: () {
+                                  _showDeposit(
+                                      context, user.uid, snapshot.data);
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      CupertinoIcons.arrow_down_left_circle,
                                       color: Theme.of(context).brightness ==
                                               Brightness.dark
                                           ? Colors.white
                                           : Colors.black,
-                                    ))
-                              ],
-                            )),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text('Deposit',
+                                        style: normalTextStyle.copyWith(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ))
+                                  ],
+                                ));
+                          },
+                        ),
                       ],
                     ),
-                    LinearProgressIndicator(
-                      color: Colors.red,
-                      minHeight: 10,
-                      borderRadius: BorderRadius.circular(10),
-                      value:
-                          .6, // Update this value (0.0 to 1.0) to reflect the current progress
-                      backgroundColor: Colors.grey[200],
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.blue),
+                    StreamBuilder(
+                      stream: PlansStreams()
+                          .getPlanFinance(user.uid, widget.plan.id),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data == null) {
+                          return LinearProgressIndicator(
+                            color: Colors.red,
+                            minHeight: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            value:
+                                0, // Update this value (0.0 to 1.0) to reflect the current progress
+                            backgroundColor: Colors.grey[200],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                getColor(widget.plan.color.toLowerCase())),
+                          );
+                        }
+
+                        return LinearProgressIndicator(
+                          color: Colors.red,
+                          minHeight: 10,
+                          borderRadius: BorderRadius.circular(10),
+                          value: calculateProgress(
+                              double.parse(snapshot.data['spent'].toString()),
+                              double.parse(snapshot.data['amount']
+                                  .toString())), // Update this value (0.0 to 1.0) to reflect the current progress
+                          backgroundColor: Colors.grey[200],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              getColor(widget.plan.color.toLowerCase())),
+                        );
+                      },
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Ksh.2500',
-                            style: normalTextStyle.copyWith(
-                              fontSize: 15,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            '50%',
-                            style: normalTextStyle.copyWith(
-                              fontSize: 15,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          )
-                        ]),
+                    StreamBuilder(
+                      stream: PlansStreams()
+                          .getPlanFinance(user.uid, widget.plan.id),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data == null) {
+                          return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Ksh ${curencyFommater(widget.plan.spent.toString())}',
+                                  style: normalTextStyle.copyWith(
+                                    fontSize: 15,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '${calculatePercentageSpent(double.parse(widget.plan.spent.toString()), double.parse(widget.plan.amount.toString())).toStringAsFixed(2)}%',
+                                  style: normalTextStyle.copyWith(
+                                    fontSize: 15,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              ]);
+                        }
+
+                        return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Ksh ${snapshot.data['spent']}',
+                                style: normalTextStyle.copyWith(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${calculatePercentageSpent(double.parse(snapshot.data['spent'].toString()), double.parse(snapshot.data['amount'].toString())).toStringAsFixed(2)}%',
+                                style: normalTextStyle.copyWith(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )
+                            ]);
+                      },
+                    ),
                   ],
                 )),
             const SizedBox(
@@ -255,98 +377,97 @@ class _ViewPlanState extends State<ViewPlan> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Tansactions'),
-                TextButton(
-                    onPressed: () {
-                      _showAddTransaction(context);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(
-                          size: 20,
-                          CupertinoIcons.add_circled,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text('Add',
-                            style: normalTextStyle.copyWith(
-                              fontSize: 14,
+                StreamBuilder(
+                  stream:
+                      PlansStreams().getPlanFinance(user.uid, widget.plan.id),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return TextButton(
+                          onPressed: null,
+                          child: Row(
+                            children: [
+                              Icon(
+                                size: 20,
+                                CupertinoIcons.add_circled,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text('Add',
+                                  style: normalTextStyle.copyWith(
+                                    fontSize: 14,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ))
+                            ],
+                          ));
+                    }
+
+                    return TextButton(
+                        onPressed: () {
+                          int amountInt = (snapshot.data['amount'] as double)
+                              .toInt(); // Safely convert double to int
+                          _showAddTransaction(context, user.uid, amountInt);
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              size: 20,
+                              CupertinoIcons.add_circled,
                               color: Theme.of(context).brightness ==
                                       Brightness.dark
                                   ? Colors.white
                                   : Colors.black,
-                            ))
-                      ],
-                    )),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text('Add',
+                                style: normalTextStyle.copyWith(
+                                  fontSize: 14,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                ))
+                          ],
+                        ));
+                  },
+                ),
               ],
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return Container(
-                    padding: const EdgeInsets.all(15),
-                    margin: const EdgeInsets.only(top: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.shopping_bag,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Shopping',
-                                  style: normalTextStyle.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  'Ksh 5,000',
-                                  style: boldTextStyle.copyWith(fontSize: 15),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Dec 12th 2024',
-                              style: normalTextStyle.copyWith(
-                                  fontSize: 15, color: Colors.grey),
-                            ),
-                            Text(
-                              '12:00 PM',
-                              style: normalTextStyle.copyWith(
-                                  fontSize: 15, color: Colors.grey),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  );
+            StreamBuilder(
+                stream: PlansStreams()
+                    .getTransactionsForPlan(user.uid, widget.plan.id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: Text('Loading Transactions...'),
+                    );
+                  }
+                  if (snapshot.data == null || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No transactions yet'),
+                    );
+                  }
+                  List<TransactionModel> data = snapshot.data!;
+                  return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        return Center(
+                          child: TransactionCard(
+                            transaction: data[index],
+                          ),
+                        );
+                      });
                 })
           ],
         ));

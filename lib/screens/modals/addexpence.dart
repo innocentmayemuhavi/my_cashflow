@@ -22,7 +22,6 @@ class _AddexpenceState extends State<Addexpence> {
   bool _isLoading = false;
   String? selectedCategory;
   Color? selectedColor;
-  final int _limit = 50000;
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
@@ -34,7 +33,8 @@ class _AddexpenceState extends State<Addexpence> {
         height: MediaQuery.of(context).size.height * 01,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: int.parse(number.isNotEmpty ? number : '0') <= _limit &&
+          physics: double.parse(number.isNotEmpty ? number : '0') <=
+                      widget.balance &&
                   number != '0' &&
                   number.isNotEmpty
               ? const BouncingScrollPhysics()
@@ -109,9 +109,9 @@ class _AddexpenceState extends State<Addexpence> {
                       ElevatedButton(
                         onPressed: number.isNotEmpty && number != '0'
                             ? () {
-                                if (int.parse(
+                                if (double.parse(
                                             number.isNotEmpty ? number : '0') <=
-                                        _limit &&
+                                        widget.balance &&
                                     number != '0' &&
                                     number.isNotEmpty) {
                                   _pageController.nextPage(

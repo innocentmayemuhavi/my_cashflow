@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/screens/singleplan/singleplan.dart';
 import 'package:my_cashflow/shared/styles.dart';
+import 'package:my_cashflow/utils/progress_calc.dart';
+import 'package:my_cashflow/utils/utils.dart';
 
 class Plancard extends StatefulWidget {
-  const Plancard({super.key});
+  const Plancard({super.key, required this.plan});
+  final PlansModel plan;
 
   @override
   State<Plancard> createState() => _PlancardState();
@@ -88,28 +92,29 @@ class _PlancardState extends State<Plancard> {
       onTap: () {
         Navigator.push(
           context,
-          CupertinoPageRoute(builder: (context) => const ViewPlan()),
+          CupertinoPageRoute(builder: (context) => ViewPlan(plan: widget.plan)),
         );
       },
       child: Container(
           padding: const EdgeInsets.all(15),
-          margin: const EdgeInsets.only(right: 10),
+          margin: const EdgeInsets.only(right: 10, bottom: 15),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(10),
           ),
-          height: 100,
+          height: 130,
           width: 300,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '#Construction',
+                '#${widget.plan.category}',
                 style: normalTextStyle.copyWith(
-                    color: Colors.blue, fontWeight: FontWeight.w600),
+                    color: getColor(widget.plan.color.toLowerCase()),
+                    fontWeight: FontWeight.w600),
               ),
               Text(
-                'House Building',
+                widget.plan.planName,
                 style: normalTextStyle.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -119,11 +124,11 @@ class _PlancardState extends State<Plancard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Ksh 5,000',
+                    'Ksh ${curencyFommater(widget.plan.spent.toString())}',
                     style: boldTextStyle.copyWith(fontSize: 15),
                   ),
                   Text(
-                    'Ksh 10,000',
+                    'Ksh ${curencyFommater(widget.plan.amount.toString())}',
                     style: normalTextStyle.copyWith(
                         fontSize: 15, color: Colors.grey),
                   ),
@@ -134,10 +139,14 @@ class _PlancardState extends State<Plancard> {
                 color: Colors.red,
                 minHeight: 10,
                 borderRadius: BorderRadius.circular(10),
-                value:
-                    .6, // Update this value (0.0 to 1.0) to reflect the current progress
+                value: calculateProgress(
+                    double.parse(widget.plan.spent.toString()),
+                    double.parse(widget.plan.amount
+                        .toString())), // Update this value (0.0 to 1.0) to reflect the current progress
                 backgroundColor: Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  getColor(widget.plan.color.toLowerCase()),
+                ),
               ),
             ],
           )),

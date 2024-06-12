@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
             scrollDirection: Axis.horizontal,
             itemCount: 10,
             itemBuilder: (context, index) {
-              return const Plancard();
+              return Container();
             },
           ),
         ),

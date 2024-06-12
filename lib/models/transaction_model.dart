@@ -10,4 +10,12 @@ class TransactionModel {
     required this.category,
     required this.timestamp,
   });
+
+  toMap() {
+    return {
+      'amount': amount,
+      'category': category,
+      'timestamp': timestamp,
+    };
+  }
 }

@@ -1,11 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/transaction_model.dart';
+import 'package:my_cashflow/services/firestore/plans/plans.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
 
 class AddPlanTransaction extends StatefulWidget {
-  const AddPlanTransaction({super.key});
+  const AddPlanTransaction(
+      {super.key,
+      required this.budget,
+      required this.uid,
+      required this.planId});
+  final int budget;
+  final String uid;
+  final String planId;
 
   @override
   State<AddPlanTransaction> createState() => _AddPlanTransactionState();
@@ -15,7 +25,8 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
   String number = '0';
   String? selectedCategory;
   Color? selectedColor;
-  final int _limit = 5000;
+  bool _isLoading = false;
+
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
@@ -26,11 +37,12 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
         height: MediaQuery.of(context).size.height * 01,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: int.parse(number.isNotEmpty ? number : '0') <= _limit &&
-                  number != '0' &&
-                  number.isNotEmpty
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
+          physics:
+              int.parse(number.isNotEmpty ? number : '0') <= widget.budget &&
+                      number != '0' &&
+                      number.isNotEmpty
+                  ? const BouncingScrollPhysics()
+                  : const NeverScrollableScrollPhysics(),
           controller: _pageController,
           children: [
             Column(
@@ -78,7 +90,7 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
                               fontSize: 35,
                               color:
                                   int.parse(number.isNotEmpty ? number : '0') <=
-                                          _limit
+                                          widget.budget
                                       ? Colors.green
                                       : Colors.red),
                           keyboardType: TextInputType.number,
@@ -94,7 +106,7 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Budget: KSH. 5000.00',
+                        'Budget: KSH. ${curencyFommater(widget.budget.toString())}',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
@@ -103,7 +115,7 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
                             ? () {
                                 if (int.parse(
                                             number.isNotEmpty ? number : '0') <=
-                                        _limit &&
+                                        widget.budget &&
                                     number != '0' &&
                                     number.isNotEmpty) {
                                   _pageController.nextPage(
@@ -116,7 +128,7 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 int.parse(number.isNotEmpty ? number : '0') <=
-                                        _limit
+                                        widget.budget
                                     ? Colors.green
                                     : Colors.red,
                             fixedSize: Size(
@@ -239,15 +251,34 @@ class _AddPlanTransactionState extends State<AddPlanTransaction> {
                         side: BorderSide(color: selectedColor ?? Colors.grey),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  onPressed: selectedCategory != null
+                  onPressed: selectedCategory != null && !_isLoading
                       ? () {
                           if (selectedCategory != null) {
-                            Navigator.pop(context);
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            PlansServices()
+                                .AddPlanTransaction(
+                                    widget.uid,
+                                    widget.planId,
+                                    TransactionModel(
+                                        amount: double.parse(number),
+                                        category: selectedCategory!,
+                                        timestamp: Timestamp.now()))
+                                .then((_) => {
+                                      Navigator.pop(context),
+                                      setState(() {
+                                        _isLoading = false;
+                                      })
+                                    })
+                                .catchError((error) {
+                              print(error);
+                            });
                           }
                         }
                       : null,
                   child: Text(
-                    'Finish',
+                    _isLoading ? 'Adding Transaction...' : 'Finish',
                     style: normalTextStyle.copyWith(color: selectedColor),
                   ),
                 )
