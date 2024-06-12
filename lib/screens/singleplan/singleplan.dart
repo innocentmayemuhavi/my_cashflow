@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:my_cashflow/models/plan_finance_model.dart';
 import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/models/transaction_model.dart';
 import 'package:my_cashflow/models/user_model.dart';
@@ -12,7 +11,6 @@ import 'package:my_cashflow/services/firestore/streams/plans_streams.dart';
 import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/date_formatter.dart';
-import 'package:my_cashflow/utils/get_col_icon.dart';
 import 'package:my_cashflow/utils/percentage_spent_calc.dart';
 import 'package:my_cashflow/utils/progress_calc.dart';
 import 'package:my_cashflow/utils/utils.dart';

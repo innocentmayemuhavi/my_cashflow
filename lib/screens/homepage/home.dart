@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/user_model.dart';
-import 'package:my_cashflow/screens/cards/plancard.dart';
 import 'package:my_cashflow/screens/cards/transactioncard.dart';
 import 'package:my_cashflow/screens/expences/expences.dart';
 import 'package:my_cashflow/screens/incomes/incomes.dart';

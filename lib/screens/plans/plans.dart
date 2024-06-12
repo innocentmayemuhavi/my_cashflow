@@ -6,7 +6,6 @@ import 'package:my_cashflow/models/transaction_model.dart';
 import 'package:my_cashflow/models/user_model.dart';
 import 'package:my_cashflow/screens/cards/plancard.dart';
 import 'package:my_cashflow/screens/createplan/createplan.dart';
-import 'package:my_cashflow/services/firestore/plans/plans.dart';
 import 'package:my_cashflow/services/firestore/streams/plans_streams.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +27,7 @@ class _PlansState extends State<Plans> {
       stream: PlansStreams().getPlans(user.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: Text('Loading Plans...'));
+          return const Center(child: Text('Loading Plans...'));
         }
         print(snapshot.data);
 

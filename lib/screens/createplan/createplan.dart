@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_date_range_picker/flutter_date_range_picker.dart';
 import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/models/user_model.dart';
 import 'package:my_cashflow/services/firestore/plans/plans.dart';
 import 'package:my_cashflow/shared/styles.dart';
-import 'package:intl/intl.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/utils/utils.dart';

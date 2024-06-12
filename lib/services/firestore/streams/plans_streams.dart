@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_cashflow/models/plan_finance_model.dart';
-import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/models/transaction_model.dart';
 
 class PlansStreams {
@@ -30,12 +28,14 @@ class PlansStreams {
         .snapshots()
         .map((DocumentSnapshot snapshot) {
       var data = snapshot.data() as Map<String, dynamic>?; // Safely cast to Map
-      if (data == null || !snapshot.exists)
+      if (data == null || !snapshot.exists) {
         return []; // Return empty list if no data or snapshot doesn't exist
+      }
       var transactionsData =
           data['transactions'] as List<dynamic>?; // Extract transactions
-      if (transactionsData == null)
+      if (transactionsData == null) {
         return []; // Return empty list if no transactions
+      }
       return transactionsData.map((transaction) {
         return TransactionModel(
           amount: transaction['amount'],

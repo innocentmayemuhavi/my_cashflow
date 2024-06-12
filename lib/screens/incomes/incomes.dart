@@ -10,7 +10,7 @@ class IncomesPage extends StatefulWidget {
 
 class _IncomesPageState extends State<IncomesPage> {
   @override
-  List<int> _items = List<int>.generate(100, (index) => index);
+  final List<int> _items = List<int>.generate(100, (index) => index);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
