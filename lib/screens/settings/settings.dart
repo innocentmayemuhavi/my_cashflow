@@ -14,32 +14,11 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   @override
-  SharedPreferences? _prefs;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize SharedPreferences on initState
-    SharedPreferences.getInstance().then((prefs) {
-      setState(() {
-        _prefs = prefs;
-      });
-    });
-  }
-  //  Future<void> _incrementCounter() async {
-  //   final SharedPreferences prefs = await _prefs;
-  //   final int counter = (prefs.getInt('counter') ?? 0) + 1;
-
-  //   setState(() {
-  //     _counter = prefs.setInt('counter', counter).then((bool success) {
-  //       return counter;
-  //     });
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(
+      context,
+    );
     return ListView(
       padding: const EdgeInsets.all(10),
       children: [
@@ -84,17 +63,29 @@ class _SettingsState extends State<Settings> {
                   children: [
                     Text('Dark Mode',
                         style: normalTextStyle.copyWith(fontSize: 15)),
-                    Switch(
-                        trackColor: WidgetStateProperty.all(
+                    Transform.scale(
+                      scale: 0.8, // Adjust the scale factor to suit your needs
+                      child: Switch(
+                        inactiveTrackColor:
                             Theme.of(context).brightness == Brightness.dark
-                                ? Colors.grey[800]
-                                : Colors.grey[400]),
-                        thumbColor: WidgetStateProperty.all(Colors.grey[200]),
-                        value: _prefs?.getBool('isDark') ?? false,
-                        onChanged: (value) {
+                                ? Colors.black
+                                : Colors.grey,
+                        inactiveThumbColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[100]
+                                : Colors.grey[400],
+                        activeColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                        value: themeProvider.themeMode == ThemeMode.dark
+                            ? true
+                            : false, // You need a boolean variable to manage the Switch state
+                        onChanged: (bool value) {
                           themeProvider.toggleTheme();
-                          // ThemeProvider().toggleTheme();
-                        })
+                        },
+                      ),
+                    ),
                   ],
                 )
               ],
