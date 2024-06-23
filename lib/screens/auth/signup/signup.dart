@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:emailjs/emailjs.dart';
 import 'package:my_cashflow/services/authentication/authentication.dart';
@@ -478,6 +477,11 @@ class _SignupState extends State<Signup> {
                   VerificationCode(
                     digitsOnly: true,
                     fullBorder: true,
+                    underlineUnfocusedColor: _code == _sentCode
+                        ? Colors.green
+                        : Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
                     textStyle: TextStyle(
                       fontSize: 20.0,
                       color: _code.length == 4 && _code != _sentCode
@@ -553,7 +557,6 @@ class _SignupState extends State<Signup> {
                                           //   }
                                         })
                                     .catchError((error) {
-                                  print(formatFirebaseError(error));
                                   setState(() {
                                     _isLoading = false;
                                     _error = formatFirebaseError(error);

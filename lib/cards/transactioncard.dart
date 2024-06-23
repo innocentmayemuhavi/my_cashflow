@@ -40,7 +40,8 @@ class _TransactionCardState extends State<TransactionCard> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  widget.transaction.category == 'Income'
+                  widget.transaction.category == 'Income' ||
+                          widget.transaction.category == 'Saving'
                       ? CupertinoIcons.arrow_down_left_circle
                       : widget.transaction.category == 'Food'
                           ? Icons.food_bank

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_cashflow/models/expence_class.dart';
 
-class WalletService {
-  final CollectionReference _wallet =
-      FirebaseFirestore.instance.collection('wallets');
+class Savings {
+  final CollectionReference _savings =
+      FirebaseFirestore.instance.collection('savings');
   final CollectionReference _incomes =
       FirebaseFirestore.instance.collection('incomes');
   final CollectionReference _expenses =
@@ -11,9 +11,9 @@ class WalletService {
   final CollectionReference _transactions =
       FirebaseFirestore.instance.collection('transactions');
 
-  Future<void> addAmount(String userId, double amount) async {
+  Future<void> AddSaving(String userId, double amount) async {
     try {
-      await _wallet.doc(userId).set({
+      await _savings.doc(userId).set({
         'balance': FieldValue.increment(amount.round()),
       }, SetOptions(merge: true));
       await _incomes.doc(userId).collection('userIncomes').add({
@@ -24,7 +24,7 @@ class WalletService {
       await _transactions.doc(userId).collection('userTransactions').add({
         'amount': amount,
         'timestamp': Timestamp.now(),
-        'category': 'Income',
+        'category': 'Saving',
       });
     } catch (e) {
       print(e);
@@ -33,14 +33,8 @@ class WalletService {
 
   Future<void> deductAmount(String userId, ExpenceClass expence) async {
     try {
-      await _wallet.doc(userId).update({
+      await _savings.doc(userId).update({
         'balance': FieldValue.increment(-expence.amount.round()),
-      });
-
-      await _expenses.doc(userId).collection('userExpenses').add({
-        'amount': expence.amount,
-        'timestamp': Timestamp.now(),
-        'category': expence.category,
       });
 
       await _transactions.doc(userId).collection('userTransactions').add({

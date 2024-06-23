@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/user_model.dart';
-import 'package:my_cashflow/screens/modals/add_income.dart';
-import 'package:my_cashflow/screens/modals/addexpence.dart';
+import 'package:my_cashflow/modals/add_income.dart';
+import 'package:my_cashflow/modals/addexpence.dart';
 import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
@@ -100,7 +100,8 @@ class _MainBlcState extends State<MainBlc> {
                       )),
                   ElevatedButton(
                       onPressed: () {
-                        _showAddExpence(context, snapshot.data!);
+                        _showAddExpence(context,
+                            snapshot.data == null ? 0.0 : snapshot.data!);
                       },
                       child: Row(
                         children: [

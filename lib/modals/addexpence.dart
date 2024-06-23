@@ -1,36 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/expence_class.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/services/firestore/wallet/wallet.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
+import 'package:provider/provider.dart';
 
-class UseSaving extends StatefulWidget {
-  const UseSaving({super.key});
+class Addexpence extends StatefulWidget {
+  const Addexpence({super.key, required this.balance});
+  final double balance;
 
   @override
-  State<UseSaving> createState() => _UseSavingState();
+  State<Addexpence> createState() => _AddexpenceState();
 }
 
-class _UseSavingState extends State<UseSaving> {
+class _AddexpenceState extends State<Addexpence> {
   String number = '0';
+  bool _isLoading = false;
   String? selectedCategory;
   Color? selectedColor;
-  final int _limit = 5000;
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
   final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return SizedBox(
         height: MediaQuery.of(context).size.height * 01,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: int.parse(number.isNotEmpty ? number : '0') <= _limit &&
-                  number != '0' &&
-                  number.isNotEmpty
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
           children: [
             Column(
@@ -59,7 +62,7 @@ class _UseSavingState extends State<UseSaving> {
                     children: [
                       Center(
                         child: Text(
-                          'Use saving',
+                          'Add Expense',
                           style: normalTextStyle.copyWith(
                               fontSize: 20, fontWeight: FontWeight.w600),
                         ),
@@ -76,11 +79,11 @@ class _UseSavingState extends State<UseSaving> {
                           controller: _controller,
                           style: normalTextStyle.copyWith(
                               fontSize: 35,
-                              color:
-                                  int.parse(number.isNotEmpty ? number : '0') <=
-                                          _limit
-                                      ? Colors.green
-                                      : Colors.red),
+                              color: double.parse(
+                                          number.isNotEmpty ? number : '0.0') <=
+                                      widget.balance
+                                  ? Colors.green
+                                  : Colors.red),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           cursorColor: Colors.green,
@@ -94,16 +97,16 @@ class _UseSavingState extends State<UseSaving> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Saving balance: KSH. 5000.00',
+                        'Wallet Balance: KSH. ${widget.balance.toStringAsFixed(2)}',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                       ElevatedButton(
                         onPressed: number.isNotEmpty && number != '0'
                             ? () {
-                                if (int.parse(
+                                if (double.parse(
                                             number.isNotEmpty ? number : '0') <=
-                                        _limit &&
+                                        widget.balance &&
                                     number != '0' &&
                                     number.isNotEmpty) {
                                   _pageController.nextPage(
@@ -114,11 +117,11 @@ class _UseSavingState extends State<UseSaving> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                int.parse(number.isNotEmpty ? number : '0') <=
-                                        _limit
-                                    ? Colors.green
-                                    : Colors.red,
+                            backgroundColor: double.parse(
+                                        number.isNotEmpty ? number : '0.0') <=
+                                    widget.balance
+                                ? Colors.green
+                                : Colors.red,
                             fixedSize: Size(
                                 MediaQuery.of(context).size.width * 0.75, 35),
                             padding: const EdgeInsets.symmetric(
@@ -239,15 +242,33 @@ class _UseSavingState extends State<UseSaving> {
                         side: BorderSide(color: selectedColor ?? Colors.grey),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  onPressed: selectedCategory != null
-                      ? () {
+                  onPressed: selectedCategory != null && !_isLoading
+                      ? () async {
                           if (selectedCategory != null) {
-                            Navigator.pop(context);
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            await WalletService()
+                                .deductAmount(
+                                    user.uid,
+                                    ExpenceClass(
+                                        amount: double.parse(number),
+                                        timestamp: Timestamp.now(),
+                                        category: selectedCategory!))
+                                .then((_) => {
+                                      setState(() => _isLoading = false),
+                                      Navigator.pop(context)
+                                    })
+                                .catchError((e) => {
+                                      setState(() => _isLoading = false),
+                                      print(e)
+                                    });
                           }
                         }
                       : null,
                   child: Text(
-                    'Finish',
+                    _isLoading ? 'Please Wait...' : 'Finish',
                     style: normalTextStyle.copyWith(color: selectedColor),
                   ),
                 )

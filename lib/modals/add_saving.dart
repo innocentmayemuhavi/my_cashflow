@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/models/user_model.dart';
+import 'package:my_cashflow/services/firestore/savings/savings.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
+import 'package:provider/provider.dart';
 
 class AddSaving extends StatefulWidget {
-  const AddSaving({super.key});
+  const AddSaving({super.key, required this.balance});
+  final double balance;
 
   @override
   State<AddSaving> createState() => _AddSavingState();
@@ -14,22 +18,20 @@ class _AddSavingState extends State<AddSaving> {
   String number = '0';
   String? selectedCategory;
   Color? selectedColor;
-  final int _limit = 50000;
+  bool _isLoading = false;
+
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
   final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    User_Class user = Provider.of<User_Class>(context);
     return SizedBox(
         height: MediaQuery.of(context).size.height * 1,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: int.parse(number.isNotEmpty ? number : '0') <= _limit &&
-                  number != '0' &&
-                  number.isNotEmpty
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
           children: [
             Column(
@@ -94,24 +96,38 @@ class _AddSavingState extends State<AddSaving> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Savings Balance: KSH. 50,000.00',
+                        'Savings Balance: KSH. ${widget.balance}',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                       ElevatedButton(
-                        onPressed: number.isNotEmpty && number != '0'
-                            ? () {
-                                if (number != '0' && number.isNotEmpty) {
-                                  Navigator.pop(context);
-                                }
-                              }
-                            : null,
+                        onPressed: _isLoading
+                            ? null
+                            : number.isNotEmpty && number != '0'
+                                ? () async {
+                                    if (number != '0' && number.isNotEmpty) {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                      Savings()
+                                          .AddSaving(
+                                              user.uid, double.parse(number))
+                                          .then((value) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                Navigator.pop(context)
+                                              })
+                                          .catchError((error) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      });
+                                    }
+                                  }
+                                : null,
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
-                            // int.parse(number.isNotEmpty ? number : '0') <=
-                            //         _limit
-                            //     ? Colors.green
-                            //     : Colors.red,
                             fixedSize: Size(
                                 MediaQuery.of(context).size.width * 0.75, 35),
                             padding: const EdgeInsets.symmetric(
@@ -119,7 +135,7 @@ class _AddSavingState extends State<AddSaving> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20))),
                         child: Text(
-                          'Deposit',
+                          _isLoading ? 'Depositing...' : 'Deposit',
                           style: normalTextStyle.copyWith(
                             color: Colors.white,
                           ),

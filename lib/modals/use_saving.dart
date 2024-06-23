@@ -2,26 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/expence_class.dart';
 import 'package:my_cashflow/models/user_model.dart';
-import 'package:my_cashflow/services/firestore/wallet/wallet.dart';
+import 'package:my_cashflow/services/firestore/savings/savings.dart';
 import 'package:my_cashflow/shared/constans.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/utils.dart';
 import 'package:numpad_layout/widgets/numpad.dart';
 import 'package:provider/provider.dart';
 
-class Addexpence extends StatefulWidget {
-  const Addexpence({super.key, required this.balance});
+class UseSaving extends StatefulWidget {
+  const UseSaving({super.key, required this.balance});
   final double balance;
 
   @override
-  State<Addexpence> createState() => _AddexpenceState();
+  State<UseSaving> createState() => _UseSavingState();
 }
 
-class _AddexpenceState extends State<Addexpence> {
+class _UseSavingState extends State<UseSaving> {
   String number = '0';
-  bool _isLoading = false;
   String? selectedCategory;
   Color? selectedColor;
+  bool _isLoading = false;
   final TextEditingController _controller =
       TextEditingController(text: 'Ksh. 0.00');
 
@@ -33,12 +33,7 @@ class _AddexpenceState extends State<Addexpence> {
         height: MediaQuery.of(context).size.height * 01,
         width: MediaQuery.of(context).size.width,
         child: PageView(
-          physics: double.parse(number.isNotEmpty ? number : '0') <=
-                      widget.balance &&
-                  number != '0' &&
-                  number.isNotEmpty
-              ? const BouncingScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
           children: [
             Column(
@@ -67,7 +62,7 @@ class _AddexpenceState extends State<Addexpence> {
                     children: [
                       Center(
                         child: Text(
-                          'Add Expense',
+                          'Use saving',
                           style: normalTextStyle.copyWith(
                               fontSize: 20, fontWeight: FontWeight.w600),
                         ),
@@ -85,7 +80,7 @@ class _AddexpenceState extends State<Addexpence> {
                           style: normalTextStyle.copyWith(
                               fontSize: 35,
                               color: double.parse(
-                                          number.isNotEmpty ? number : '0.0') <=
+                                          number.isNotEmpty ? number : '0') <=
                                       widget.balance
                                   ? Colors.green
                                   : Colors.red),
@@ -102,7 +97,7 @@ class _AddexpenceState extends State<Addexpence> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Wallet Balance: KSH. ${widget.balance.toStringAsFixed(2)}',
+                        'Saving balance: KSH. ${widget.balance}',
                         style: normalTextStyle.copyWith(
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
@@ -123,7 +118,7 @@ class _AddexpenceState extends State<Addexpence> {
                             : null,
                         style: ElevatedButton.styleFrom(
                             backgroundColor: double.parse(
-                                        number.isNotEmpty ? number : '0.0') <=
+                                        number.isNotEmpty ? number : '0') <=
                                     widget.balance
                                 ? Colors.green
                                 : Colors.red,
@@ -247,33 +242,37 @@ class _AddexpenceState extends State<Addexpence> {
                         side: BorderSide(color: selectedColor ?? Colors.grey),
                         borderRadius: BorderRadius.circular(20)),
                   ),
-                  onPressed: selectedCategory != null && !_isLoading
-                      ? () async {
-                          if (selectedCategory != null) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            await WalletService()
-                                .deductAmount(
-                                    user.uid,
-                                    ExpenceClass(
-                                        amount: double.parse(number),
-                                        timestamp: Timestamp.now(),
-                                        category: selectedCategory!))
-                                .then((_) => {
-                                      setState(() => _isLoading = false),
-                                      Navigator.pop(context)
-                                    })
-                                .catchError((e) => {
-                                      setState(() => _isLoading = false),
-                                      print(e)
-                                    });
-                          }
-                        }
-                      : null,
+                  onPressed: _isLoading
+                      ? null
+                      : selectedCategory != null
+                          ? () {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              if (selectedCategory != null) {
+                                Savings()
+                                    .deductAmount(
+                                        user.uid,
+                                        ExpenceClass(
+                                            amount: double.parse(number),
+                                            timestamp: Timestamp.now(),
+                                            category: selectedCategory!))
+                                    .then((_) => {
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
+                                          Navigator.pop(context)
+                                        })
+                                    .catchError((error) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                });
+                              }
+                            }
+                          : null,
                   child: Text(
-                    _isLoading ? 'Please Wait...' : 'Finish',
+                    _isLoading ? 'Finishing...' : 'Finish',
                     style: normalTextStyle.copyWith(color: selectedColor),
                   ),
                 )

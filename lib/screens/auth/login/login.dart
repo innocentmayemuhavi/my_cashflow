@@ -282,6 +282,11 @@ class _LoginState extends State<Login> {
                   VerificationCode(
                     digitsOnly: true,
                     fullBorder: true,
+                    underlineUnfocusedColor: _code == _sentCode
+                        ? Colors.green
+                        : Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
                     textStyle: TextStyle(
                       fontSize: 20.0,
                       color: Theme.of(context).brightness == Brightness.dark

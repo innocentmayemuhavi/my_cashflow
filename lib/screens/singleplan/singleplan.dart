@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/models/transaction_model.dart';
 import 'package:my_cashflow/models/user_model.dart';
-import 'package:my_cashflow/screens/cards/transactioncard.dart';
-import 'package:my_cashflow/screens/modals/add_deposit.dart';
-import 'package:my_cashflow/screens/modals/addplanbudget.dart';
-import 'package:my_cashflow/screens/modals/deleteplan.dart';
+import 'package:my_cashflow/cards/transactioncard.dart';
+import 'package:my_cashflow/modals/add_deposit.dart';
+import 'package:my_cashflow/modals/addplanbudget.dart';
+import 'package:my_cashflow/modals/deleteplan.dart';
 import 'package:my_cashflow/services/firestore/streams/plans_streams.dart';
 import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
@@ -38,9 +38,7 @@ class _ViewPlanState extends State<ViewPlan> {
         ),
         builder: (context) {
           return AddPlanTransaction(
-              budget: int.parse(budget.toString()),
-              uid: uid,
-              planId: widget.plan.id);
+              budget: budget, uid: uid, planId: widget.plan.id);
         });
   }
 
@@ -59,7 +57,7 @@ class _ViewPlanState extends State<ViewPlan> {
           return PlanDeposit(
             uid: uid,
             planId: widget.plan.id,
-            budget: budget,
+            budget: budget ?? 0,
           );
         });
   }
@@ -238,7 +236,7 @@ class _ViewPlanState extends State<ViewPlan> {
                             }
 
                             return Text(
-                              'Ksh  ${snapshot.data['amount'].toString()}',
+                              'Ksh  ${curencyFommater(snapshot.data['amount'].toString())}',
                               style: boldTextStyle.copyWith(
                                 color: Theme.of(context).brightness ==
                                         Brightness.dark
@@ -348,7 +346,7 @@ class _ViewPlanState extends State<ViewPlan> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Ksh ${snapshot.data['spent']}',
+                                'Ksh  ${curencyFommater(snapshot.data['spent'].toString())}',
                                 style: normalTextStyle.copyWith(
                                   fontSize: 15,
                                   color: Colors.grey,
@@ -409,9 +407,12 @@ class _ViewPlanState extends State<ViewPlan> {
 
                     return TextButton(
                         onPressed: () {
-                          int amountInt = (snapshot.data['amount'] as double)
-                              .toInt(); // Safely convert double to int
-                          _showAddTransaction(context, user.uid, amountInt);
+                          // print(snapshot.data['amount']);
+
+                          // int amountInt = (snapshot.data['amount'] as double)
+                          //     .toInt(); // Safely convert double to int
+                          _showAddTransaction(context, user.uid,
+                              snapshot.data['amount'].round());
                         },
                         child: Row(
                           children: [

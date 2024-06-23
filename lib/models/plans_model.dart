@@ -1,4 +1,4 @@
-import 'package:my_cashflow/models/transaction_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlansModel {
   final String id;
@@ -8,9 +8,8 @@ class PlansModel {
   final int amount;
   final int spent;
   final String description;
-  final DateTime startDate;
-  final DateTime endDate;
-  final List<TransactionModel> transactions;
+  final DateTime startDate; // Changed to DateTime
+  final DateTime endDate; // Changed to DateTime
 
   PlansModel({
     required this.id,
@@ -22,7 +21,6 @@ class PlansModel {
     required this.planName,
     required this.startDate,
     required this.spent,
-    required this.transactions,
   });
 
   Map<String, dynamic> toMap() {
@@ -32,11 +30,13 @@ class PlansModel {
       'category': category,
       'color': color,
       'description': description,
-      'endDate': endDate,
+      'endDate':
+          Timestamp.fromDate(endDate), // Convert DateTime back to Timestamp
       'planName': planName,
-      'startDate': startDate,
+      'startDate':
+          Timestamp.fromDate(startDate), // Convert DateTime back to Timestamp
       'spent': spent,
-      'transactions': transactions
+      // Ensure transactions are properly serialized
     };
   }
 }

@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/models/user_model.dart';
-import 'package:my_cashflow/screens/cards/transactioncard.dart';
+import 'package:my_cashflow/cards/plancard.dart';
+import 'package:my_cashflow/cards/transactioncard.dart';
+import 'package:my_cashflow/screens/createplan/createplan.dart';
 import 'package:my_cashflow/screens/expences/expences.dart';
 import 'package:my_cashflow/screens/incomes/incomes.dart';
+import 'package:my_cashflow/services/firestore/streams/plans_streams.dart';
 import 'package:my_cashflow/services/firestore/streams/walletstream.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/utils/formart_curr.dart';
 import 'package:my_cashflow/widgets/main_blc.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -308,17 +312,78 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 150, // Set a specific height
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return Container();
-            },
-          ),
-        ),
+            height: 150, // Set a specific height
+            child: StreamBuilder(
+                stream: PlansStreams().getPlans(user.uid),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: Column(
+                      children: [
+                        SpinKitFadingCircle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          size: 50.0,
+                        ),
+                        Text('Loading Plans ..', style: normalTextStyle),
+                      ],
+                    ));
+                  }
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: Text('No Plans yet!'),
+                    );
+                  }
+
+                  if (snapshot.data!.isEmpty) {
+                    return Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'No plans yet!',
+                          style: normalTextStyle,
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .color ??
+                                    Colors.black, // Added a fallback color
+                                width: 1,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const CreatePlan()));
+                            },
+                            child: Text(
+                              'Create Plan',
+                              style: normalTextStyle.copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .color),
+                            ))
+                      ],
+                    ));
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    itemCount:
+                        snapshot.data!.length >= 3 ? 3 : snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return Plancard(plan: snapshot.data![index]);
+                    },
+                  );
+                })),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -339,36 +404,41 @@ class _HomePageState extends State<HomePage> {
           stream: Walletstream().getTransactions(user.uid),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                padding: const EdgeInsets.all(100),
-                child: Center(
-                  child: Text(
-                    'Loading Transactions ..',
-                    style: normalTextStyle,
+              return Center(
+                  child: Column(
+                children: [
+                  SpinKitFadingCircle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    size: 50.0,
                   ),
-                ),
-              ); // return a loading indicator while waiting
+                  Text('Loading Transactions ..', style: normalTextStyle),
+                ],
+              ));
             }
-
-            if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return TransactionCard(transaction: snapshot.data![index]);
-                },
+            if (!snapshot.hasData) {
+              return Center(
+                child: Text(
+                  'No Transactions yet!',
+                  style: normalTextStyle,
+                ),
+              );
+            }
+            if (snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  'No Transactions yet!',
+                  style: normalTextStyle,
+                ),
               );
             }
 
-            return Container(
-              padding: const EdgeInsets.all(100),
-              child: Center(
-                child: Text(
-                  'Sorry, No transactions yet!.',
-                  style: normalTextStyle,
-                ),
-              ),
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: snapshot.data!.length >= 3 ? 3 : snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return TransactionCard(transaction: snapshot.data![index]);
+              },
             );
           },
         )

@@ -11,7 +11,7 @@ class TransactionModel {
     required this.timestamp,
   });
 
-  toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'amount': amount,
       'category': category,

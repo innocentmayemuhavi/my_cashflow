@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_cashflow/models/plans_model.dart';
 import 'package:my_cashflow/models/transaction_model.dart';
 
 class PlansStreams {
@@ -12,8 +13,21 @@ class PlansStreams {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return doc.data();
-      }).toList();
+        return PlansModel(
+          id: doc.data()['id'],
+          amount: doc.data()['amount'],
+          category: doc.data()['category'],
+          color: doc.data()['color'],
+          description: doc.data()['description'],
+          endDate: (doc.data()['endDate'] as Timestamp).toDate(),
+          planName: doc.data()['planName'],
+          startDate: (doc.data()['startDate'] as Timestamp).toDate(),
+          spent: doc.data()['spent'],
+        );
+      }).toList()
+        ..sort((a, b) {
+          return b.startDate.compareTo(a.startDate);
+        });
     });
   }
 
@@ -25,25 +39,16 @@ class PlansStreams {
         .doc(userId)
         .collection('userPlans')
         .doc(planId)
+        .collection('transactions')
         .snapshots()
-        .map((DocumentSnapshot snapshot) {
-      var data = snapshot.data() as Map<String, dynamic>?; // Safely cast to Map
-      if (data == null || !snapshot.exists) {
-        return []; // Return empty list if no data or snapshot doesn't exist
-      }
-      var transactionsData =
-          data['transactions'] as List<dynamic>?; // Extract transactions
-      if (transactionsData == null) {
-        return []; // Return empty list if no transactions
-      }
-      return transactionsData.map((transaction) {
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
         return TransactionModel(
-          amount: transaction['amount'],
-          category: transaction['category'],
-          timestamp: transaction['timestamp'],
+          amount: doc.data()['amount'],
+          category: doc.data()['category'],
+          timestamp: doc.data()['timestamp'],
         );
-      }).toList()
-        ..sort((b, a) => a.timestamp.compareTo(b.timestamp));
+      }).toList();
     });
   }
 

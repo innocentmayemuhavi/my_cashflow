@@ -290,7 +290,6 @@ class _CreatePlanState extends State<CreatePlan> {
                                           .add(const Duration(days: 3)),
                                   planName: _planName!,
                                   startDate: _startDate ?? DateTime.now(),
-                                  transactions: [],
                                 ))
                             .then((_) => {
                                   setState(() {
