@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_cashflow/providers/theme_provider.dart';
+import 'package:my_cashflow/screens/settings/pages/notifications.dart';
+import 'package:my_cashflow/screens/settings/pages/theme_mode.dart';
 import 'package:my_cashflow/services/authentication/authentication.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:provider/provider.dart';
@@ -19,173 +22,203 @@ class _SettingsState extends State<Settings> {
     final themeProvider = Provider.of<ThemeProvider>(
       context,
     );
-    return ListView(
-      padding: const EdgeInsets.all(10),
-      children: [
+    return Scaffold(
+        body: ListView(
+      padding: const EdgeInsets.all(12),
+      children: <Widget>[
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: ListTile(
+              title: Text('Account',
+                  style: normalTextStyle.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color)),
+              subtitle: Text(
+                'Privacy, security, change password',
+                style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const NotificationSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('App Appearance',
-                        style: normalTextStyle.copyWith(fontSize: 20)),
-                    Text('Update your app appearance here',
-                        style: normalTextStyle.copyWith(fontSize: 15))
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text('Dark Mode',
-                        style: normalTextStyle.copyWith(fontSize: 15)),
-                    Transform.scale(
-                      scale: 0.8, // Adjust the scale factor to suit your needs
-                      child: Switch(
-                        inactiveTrackColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Colors.black
-                                : Colors.grey,
-                        inactiveThumbColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Colors.grey[100]
-                                : Colors.grey[400],
-                        activeColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black,
-                        value: themeProvider.themeMode == ThemeMode.dark
-                            ? true
-                            : false, // You need a boolean variable to manage the Switch state
-                        onChanged: (bool value) {
-                          themeProvider.toggleTheme();
-                        },
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            )),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+
+            borderRadius: BorderRadius.circular(
+                15.0), // Optional: if you want rounded corners
+          ),
+          child: ListTile(
+              title: Text(
+                'Notifications',
+                style: normalTextStyle.copyWith(
+                    color: Theme.of(context).textTheme.bodySmall!.color),
+              ),
+              subtitle: Text(
+                'Push notifications, message and call tones',
+                style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const NotificationSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+
+            borderRadius: BorderRadius.circular(
+                15.0), // Optional: if you want rounded corners
+          ),
+          child: ListTile(
+              title: Text(
+                'App Appearance',
+                style: normalTextStyle.copyWith(
+                    color: Theme.of(context).textTheme.bodySmall!.color),
+              ),
+              subtitle: Text(
+                'App theme',
+                style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const ThemeModeSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+
+            borderRadius: BorderRadius.circular(
+                15.0), // Optional: if you want rounded corners
+          ),
+          child: ListTile(
+              title: Text('Data and storage usage',
+                  style: normalTextStyle.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color)),
+              subtitle: Text('Network usage, auto-download,auto-play',
+                  style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color,
+                  )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const NotificationSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+
+            borderRadius: BorderRadius.circular(
+                15.0), // Optional: if you want rounded corners
+          ),
+          child: ListTile(
+              title: Text('Permissions',
+                  style: normalTextStyle.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color)),
+              subtitle: Text('Camera, microphone, contacts',
+                  style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color,
+                  )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const NotificationSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme.of(context).textTheme.bodySmall!.color!,
-                    width: .5),
-                borderRadius: BorderRadius.circular(7)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account Settings',
-                    style: normalTextStyle.copyWith(fontSize: 20)),
-                Text('Update your account details here',
-                    style: normalTextStyle.copyWith(fontSize: 15))
-              ],
-            )),
-        ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                side: const BorderSide(color: Colors.red, width: 1)),
-            onPressed: () {
-              Authentication().signOut();
-            },
-            child: Text(
-              'Sign Out',
-              style: normalTextStyle.copyWith(color: Colors.red),
-            ))
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!.withOpacity(.4)
+                : Colors.grey[100],
+
+            borderRadius: BorderRadius.circular(
+                15.0), // Optional: if you want rounded corners
+          ),
+          child: ListTile(
+              title: Text('Frequently asked questions',
+                  style: normalTextStyle.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall!.color)),
+              subtitle: Text('FAQs, contact us, privacy policy',
+                  style: normalTextStyle.copyWith(
+                    fontSize: 13,
+                    color: Theme.of(context).textTheme.bodySmall!.color,
+                  )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const NotificationSetting(),
+                  ),
+                );
+              },
+              trailing: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ),
+        const SizedBox(
+          height: 70,
+        ),
+        // ElevatedButton(
+        //     style: ElevatedButton.styleFrom(
+        //         side: const BorderSide(color: Colors.red, width: 1)),
+        //     onPressed: () {
+        //       Authentication().signOut();
+        //     },
+        //     child: Text(
+        //       'Sign Out',
+        //       style: normalTextStyle.copyWith(color: Colors.red),
+        //     ))
       ],
-    );
+    ));
   }
 }

@@ -7,6 +7,7 @@ import 'package:my_cashflow/screens/plans/plans.dart';
 import 'package:my_cashflow/screens/savings/savings.dart';
 import 'package:my_cashflow/screens/settings/settings.dart';
 import 'package:my_cashflow/screens/wallet/wallet.dart';
+import 'package:my_cashflow/services/authentication/authentication.dart';
 import 'package:my_cashflow/shared/styles.dart';
 import 'package:my_cashflow/widgets/appbar.dart';
 import 'package:my_cashflow/widgets/bottom_nav_bar.dart';
@@ -22,6 +23,7 @@ class HomeMain extends StatefulWidget {
 class _HomeMainState extends State<HomeMain> {
   int _currentIndex = 0;
   int _previousIndex = 0;
+  bool _isLoading = false;
   final List<Widget> _screens = [
     const HomePage(),
     const Wallet(),
@@ -46,7 +48,8 @@ class _HomeMainState extends State<HomeMain> {
         onItemTapped: _onItemTapped,
         isTitleCentered: _currentIndex == 0 ? false : true,
         hasLeading: _currentIndex == 0 ? false : true,
-        hasAction: _currentIndex == 1 || _currentIndex == 2,
+        hasAction:
+            _currentIndex == 1 || _currentIndex == 2 || _currentIndex == 3,
         actions: [
           _currentIndex == 2
               ? TextButton(
@@ -56,23 +59,55 @@ class _HomeMainState extends State<HomeMain> {
                         CupertinoPageRoute(
                             builder: (context) => const CreatePlan()));
                   },
-                  child: Text(
-                    'Add Plan',
-                    style: normalTextStyle.copyWith(color: Colors.white),
-                  ),
+                  child: Text('Add Plan',
+                      style: normalTextStyle.copyWith(
+                        color: Theme.of(context).textTheme.bodySmall!.color,
+                      )),
                 )
-              : TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                            builder: (context) => const SavingsPage()));
-                  },
-                  child: Text(
-                    'Savings',
-                    style: normalTextStyle.copyWith(color: Colors.white),
-                  ),
-                )
+              : _currentIndex == 3
+                  ? TextButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              Authentication()
+                                  .signOut()
+                                  .then((_) => setState(() {
+                                        _isLoading = false;
+                                      }))
+                                  .catchError((error) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(error.toString()),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              });
+                            },
+                      child: Text(
+                        _isLoading ? 'Loging out...' : 'Logout',
+                        style: normalTextStyle.copyWith(color: Colors.red),
+                      ),
+                    )
+                  : TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => const SavingsPage()));
+                      },
+                      child: Text(
+                        'Savings',
+                        style: normalTextStyle.copyWith(
+                            color:
+                                Theme.of(context).textTheme.bodySmall!.color),
+                      ),
+                    )
         ],
         title: _currentIndex == 0
             ? Row(children: [
