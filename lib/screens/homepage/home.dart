@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     User_Class user = Provider.of<User_Class>(context);
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(10),
       children: <Widget>[
         const MainBlc(),
         const SizedBox(height: 20),
@@ -43,173 +43,45 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 10),
         Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(20),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .4,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      const Icon(
-                        CupertinoIcons.arrow_down_left_circle,
-                      ),
-                      Container(
-                        width: 55,
-                      ),
-                      StreamBuilder(
-                          stream: Walletstream().getIncome(user.uid),
-                          builder: (context, snapshot) {
-                            return Row(
-                              children: [
-                                Icon(
-                                  snapshot.data != null
-                                      ? snapshot.data!.percentage < 0
-                                          ? snapshot.data!.percentage == 0
-                                              ? Icons.remove
-                                              : Icons.trending_down
-                                          : Icons.trending_up
-                                      : Icons.line_axis,
-                                  color: snapshot.data != null
-                                      ? snapshot.data!.percentage < 0
-                                          ? Colors.red
-                                          : snapshot.data!.percentage == 0
-                                              ? Colors.grey
-                                              : Colors.green
-                                      : Colors.grey,
-                                  size: 17,
-                                ),
-                                Text(
-                                  snapshot.data != null
-                                      ? '${snapshot.data!.percentage.toString()} %'
-                                      : '0.0%',
-                                  style: normalTextStyle.copyWith(
-                                      color: snapshot.data != null
-                                          ? snapshot.data!.percentage < 0
-                                              ? Colors.red
-                                              : snapshot.data!.percentage == 0
-                                                  ? Colors.grey
-                                                  : Colors.green
-                                          : Colors.grey,
-                                      fontSize: 15),
-                                )
-                              ],
-                            );
-                          })
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => const IncomesPage()),
-                          );
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Incomes',
-                                style: normalTextStyle.copyWith(
-                                    fontSize: 20, color: Colors.grey)),
-                            StreamBuilder(
-                                stream: Walletstream().getIncome(user.uid),
-                                builder: (context, snapshot) {
-                                  return Text(
-                                    snapshot.data != null
-                                        ? 'Ksh ${formatNumber(snapshot.data!.total)}'
-                                        : 'Ksh. 0.0',
-                                    style: boldTextStyle.copyWith(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.normal),
-                                  );
-                                })
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        padding: const EdgeInsets.all(0),
-                        style: ButtonStyle(
-                          shape:
-                              WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  50), // Adjust this value as needed
-                              side: const BorderSide(
-                                  color: Colors
-                                      .grey), // Adjust this value as needed
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => const IncomesPage()),
-                          );
-                        },
-                        icon: const Icon(
-                          CupertinoIcons.arrow_up_right,
-                          size: 15,
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => const MyExpences()),
-                  );
-                },
+              child: Container(
+                width: MediaQuery.of(context).size.width * .47,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         const Icon(
-                          CupertinoIcons.arrow_up_right_circle,
-                        ),
-                        Container(
-                          width: 55,
+                          CupertinoIcons.arrow_down_left_circle,
                         ),
                         StreamBuilder(
-                            stream: Walletstream().getSpending(user.uid),
+                            stream: Walletstream().getIncome(user.uid),
                             builder: (context, snapshot) {
                               return Row(
                                 children: [
                                   Icon(
                                     snapshot.data != null
-                                        ? snapshot.data!.percentage > 0
-                                            ? Icons.trending_up
-                                            : snapshot.data!.percentage == 0.0
+                                        ? snapshot.data!.percentage < 0
+                                            ? snapshot.data!.percentage == 0
                                                 ? Icons.remove
                                                 : Icons.trending_down
-                                        : Icons.remove,
+                                            : Icons.trending_up
+                                        : Icons.line_axis,
                                     color: snapshot.data != null
-                                        ? snapshot.data!.percentage > 0
+                                        ? snapshot.data!.percentage < 0
                                             ? Colors.red
                                             : snapshot.data!.percentage == 0
                                                 ? Colors.grey
@@ -219,11 +91,11 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   Text(
                                     snapshot.data != null
-                                        ? '${snapshot.data!.percentage.toString()}%'
+                                        ? '${snapshot.data!.percentage.toString()} %'
                                         : '0.0%',
                                     style: normalTextStyle.copyWith(
                                         color: snapshot.data != null
-                                            ? snapshot.data!.percentage > 0
+                                            ? snapshot.data!.percentage < 0
                                                 ? Colors.red
                                                 : snapshot.data!.percentage == 0
                                                     ? Colors.grey
@@ -237,29 +109,37 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Spending',
-                                style: normalTextStyle.copyWith(
-                                    fontSize: 20, color: Colors.grey)),
-                            StreamBuilder(
-                                stream: Walletstream().getSpending(user.uid),
-                                builder: (context, snapshot) {
-                                  // Check if snapshot.data is not null before accessing its total property
-
-                                  return Text(
-                                    snapshot.data != null
-                                        ? 'Ksh ${formatNumber(snapshot.data!.total)}'
-                                        : 'Ksh. 0.0',
-                                    style: boldTextStyle.copyWith(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.normal),
-                                  );
-                                })
-                          ],
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (context) => const IncomesPage()),
+                            );
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Incomes',
+                                  style: normalTextStyle.copyWith(
+                                      fontSize: 18, color: Colors.grey)),
+                              StreamBuilder(
+                                  stream: Walletstream().getIncome(user.uid),
+                                  builder: (context, snapshot) {
+                                    return Text(
+                                      snapshot.data != null
+                                          ? 'Ksh ${formatNumber(snapshot.data!.total)}'
+                                          : 'Ksh. 0.0',
+                                      style: boldTextStyle.copyWith(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.normal),
+                                    );
+                                  })
+                            ],
+                          ),
                         ),
                         IconButton(
                           padding: const EdgeInsets.all(0),
@@ -279,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                  builder: (context) => const MyExpences()),
+                                  builder: (context) => const IncomesPage()),
                             );
                           },
                           icon: const Icon(
@@ -290,6 +170,137 @@ class _HomePageState extends State<HomePage> {
                       ],
                     )
                   ],
+                ),
+              ),
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .42,
+              ),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                width: MediaQuery.of(context).size.width * .47,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (context) => const MyExpences()),
+                    );
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Icon(
+                            CupertinoIcons.arrow_up_right_circle,
+                          ),
+                          StreamBuilder(
+                              stream: Walletstream().getSpending(user.uid),
+                              builder: (context, snapshot) {
+                                return Row(
+                                  children: [
+                                    Icon(
+                                      snapshot.data != null
+                                          ? snapshot.data!.percentage > 0
+                                              ? Icons.trending_up
+                                              : snapshot.data!.percentage == 0.0
+                                                  ? Icons.remove
+                                                  : Icons.trending_down
+                                          : Icons.remove,
+                                      color: snapshot.data != null
+                                          ? snapshot.data!.percentage > 0
+                                              ? Colors.red
+                                              : snapshot.data!.percentage == 0
+                                                  ? Colors.grey
+                                                  : Colors.green
+                                          : Colors.grey,
+                                      size: 17,
+                                    ),
+                                    Text(
+                                      snapshot.data != null
+                                          ? '${snapshot.data!.percentage.toString()}%'
+                                          : '0.0%',
+                                      style: normalTextStyle.copyWith(
+                                          color: snapshot.data != null
+                                              ? snapshot.data!.percentage > 0
+                                                  ? Colors.red
+                                                  : snapshot.data!.percentage ==
+                                                          0
+                                                      ? Colors.grey
+                                                      : Colors.green
+                                              : Colors.grey,
+                                          fontSize: 15),
+                                    )
+                                  ],
+                                );
+                              })
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Spending',
+                                  style: normalTextStyle.copyWith(
+                                      fontSize: 18, color: Colors.grey)),
+                              StreamBuilder(
+                                  stream: Walletstream().getSpending(user.uid),
+                                  builder: (context, snapshot) {
+                                    // Check if snapshot.data is not null before accessing its total property
+
+                                    return Text(
+                                      snapshot.data != null
+                                          ? 'Ksh ${formatNumber(snapshot.data!.total)}'
+                                          : 'Ksh. 0.0',
+                                      style: boldTextStyle.copyWith(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.normal),
+                                    );
+                                  })
+                            ],
+                          ),
+                          IconButton(
+                            padding: const EdgeInsets.all(0),
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      50), // Adjust this value as needed
+                                  side: const BorderSide(
+                                      color: Colors
+                                          .grey), // Adjust this value as needed
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => const MyExpences()),
+                              );
+                            },
+                            icon: const Icon(
+                              CupertinoIcons.arrow_up_right,
+                              size: 15,
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             )

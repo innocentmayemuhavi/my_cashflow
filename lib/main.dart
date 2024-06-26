@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_cashflow/firebase_options.dart';
 import 'package:my_cashflow/providers/theme_provider.dart';
 import 'package:my_cashflow/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,7 +7,9 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding().ensureSemantics();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

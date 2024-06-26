@@ -44,12 +44,14 @@ class _SavingsContainerState extends State<SavingsContainer> {
   Widget build(BuildContext context) {
     User_Class user = Provider.of<User_Class>(context);
     return Container(
+        height: MediaQuery.of(context).size.height * .21,
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               'My Savings',

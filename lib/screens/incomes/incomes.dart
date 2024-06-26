@@ -61,13 +61,27 @@ class _IncomesPageState extends State<IncomesPage> {
                 ));
               }
               if (snapshot.hasError) {
-                return const Center(
-                  child: Text('An error occurred'),
+                return Center(
+                  child: Text(
+                    'An error occurred',
+                    style: normalTextStyle,
+                  ),
                 );
               }
               if (!snapshot.hasData) {
-                return const Center(
-                  child: Text('No incomes yet'),
+                return Center(
+                  child: Text(
+                    'No incomes yet',
+                    style: normalTextStyle,
+                  ),
+                );
+              }
+              if (snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No incomes yet!',
+                    style: normalTextStyle,
+                  ),
                 );
               }
               return Scrollbar(

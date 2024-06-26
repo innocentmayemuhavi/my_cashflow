@@ -107,7 +107,9 @@ class _AddIncomeState extends State<AddIncome> {
                             fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                       ElevatedButton(
-                        onPressed: number.isNotEmpty && number != '0'&&!_isLoading
+                        onPressed: number.isNotEmpty &&
+                                number != '0' &&
+                                !_isLoading
                             ? () async {
                                 if (number != '0' && number.isNotEmpty) {
                                   setState(() {

@@ -38,6 +38,8 @@ class Authentication {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      print(displayName);
+      await result.user!.updateDisplayName(displayName);
       await result.user!.updateDisplayName(displayName);
 
       // Send email verification

@@ -1,0 +1,36 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "cashflow-e54a0",
+          "appId": "1:53580920739:android:85e521c7520f1b3365cc16",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "cashflow-e54a0",
+          "configurations": {
+            "android": "1:53580920739:android:85e521c7520f1b3365cc16",
+            "ios": "1:53580920739:ios:260966c0528969bf65cc16",
+            "macos": "1:53580920739:ios:260966c0528969bf65cc16",
+            "web": "1:53580920739:web:d6478e196123df9265cc16",
+            "windows": "1:53580920739:web:c8b4a6d61c15de6165cc16"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  }
+}

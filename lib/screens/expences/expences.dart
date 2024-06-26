@@ -67,8 +67,19 @@ class _MyExpencesState extends State<MyExpences> {
                 );
               }
               if (!snapshot.hasData) {
-                return const Center(
-                  child: Text('No Expences yet'),
+                return Center(
+                  child: Text(
+                    'No Expences yet!',
+                    style: normalTextStyle,
+                  ),
+                );
+              }
+              if (snapshot.data!.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No Expences yet!',
+                    style: normalTextStyle,
+                  ),
                 );
               }
               return Scrollbar(

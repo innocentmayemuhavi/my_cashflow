@@ -44,12 +44,14 @@ class _MainBlcState extends State<MainBlc> {
   Widget build(BuildContext context) {
     User_Class user = Provider.of<User_Class>(context);
     return Container(
-      padding: const EdgeInsets.all(15),
+      height: MediaQuery.of(context).size.height * .21,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'My balance',

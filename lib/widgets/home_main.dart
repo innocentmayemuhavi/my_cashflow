@@ -114,7 +114,7 @@ class _HomeMainState extends State<HomeMain> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hello, ${user.displayName}',
+                    Text('Hello, ${user.displayName ?? 'There'}',
                         style: normalTextStyle.copyWith(fontSize: 30)),
                     Text(
                       'Your Cashflow',
